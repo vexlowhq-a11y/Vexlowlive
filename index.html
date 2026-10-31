@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Vexlow Live</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/live.css">
+</head>
+<body>
+  <!-- Lienzo fijo 1080x1920 (vertical TikTok). Se escala solo a la ventana. -->
+  <div id="escenario">
+
+    <!-- ESCENA 1: INICIO -->
+    <section class="escena" data-escena="inicio">
+      <div class="fondo-marca"></div>
+      <div class="centro">
+        <img class="logo-grande" src="img/logo-512.png" alt="">
+        <h1 class="titulo" data-marca></h1>
+        <p class="subtitulo" data-subtitulo></p>
+        <p class="etiqueta">Empezamos en</p>
+        <div class="cuenta" id="cuenta">05:00</div>
+        <div class="fila-juegos" data-fila-juegos></div>
+      </div>
+    </section>
+
+    <!-- ESCENA 2: JUEGO (el centro queda libre para capturar el juego) -->
+    <section class="escena" data-escena="juego">
+      <header class="barra-sup">
+        <img class="logo-chico" src="img/logo.svg" alt="">
+        <span class="marca-chica" data-marca></span>
+        <span class="en-vivo"><i></i>EN VIVO</span>
+      </header>
+      <div class="hueco"></div>
+      <div class="tarjeta-juego">
+        <img data-juego-icono alt="">
+        <div>
+          <strong data-juego-nombre></strong>
+          <span data-juego-frase></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESCENA 3: PAUSA -->
+    <section class="escena" data-escena="pausa">
+      <div class="fondo-marca"></div>
+      <div class="centro">
+        <img class="logo-grande latido" src="img/logo-512.png" alt="">
+        <h1 class="titulo">Ya volvemos<span class="puntos"><b>.</b><b>.</b><b>.</b></span></h1>
+        <p class="subtitulo">No te vayas, seguimos jugando</p>
+        <div class="fila-juegos" data-fila-juegos></div>
+      </div>
+    </section>
+
+    <!-- ESCENA 4: CIERRE -->
+    <section class="escena" data-escena="cierre">
+      <div class="fondo-marca"></div>
+      <div class="centro">
+        <img class="logo-grande" src="img/logo-512.png" alt="">
+        <h1 class="titulo">¡Gracias por ver!</h1>
+        <p class="subtitulo" data-seguinos>Seguinos para el próximo live</p>
+        <div class="vitrina" data-vitrina></div>
+      </div>
+    </section>
+
+    <!-- Cinta de mensajes (todas las escenas) -->
+    <footer class="cinta" id="cinta">
+      <div class="cinta-donde" data-juego-donde></div>
+      <div class="cinta-mensaje" id="cinta-mensaje"></div>
+    </footer>
+
+    <!-- Ayuda: solo se ve al apretar H (no la dejes abierta en vivo) -->
+    <aside class="ayuda" id="ayuda" hidden>
+      <h2>Atajos</h2>
+      <ul>
+        <li><kbd>1</kbd> Inicio</li>
+        <li><kbd>2</kbd> Juego</li>
+        <li><kbd>3</kbd> Pausa</li>
+        <li><kbd>4</kbd> Cierre</li>
+        <li><kbd>←</kbd> <kbd>→</kbd> Cambiar juego</li>
+        <li><kbd>R</kbd> Reiniciar cuenta</li>
+        <li><kbd>+</kbd> <kbd>-</kbd> Cuenta ±1 min</li>
+        <li><kbd>T</kbd> Mostrar/ocultar cinta</li>
+        <li><kbd>H</kbd> Cerrar esta ayuda</li>
+      </ul>
+    </aside>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="js/live.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+Tipografías incluidas (servidas desde el propio dominio):
+
+- Bricolage Grotesque — Mathieu Triay y colaboradores. SIL Open Font License 1.1.
+  https://github.com/ateliertriay/bricolage
+- Bungee — David Jonathan Ross. SIL Open Font License 1.1.
+  https://github.com/djrrb/Bungee
+
+Texto de la licencia: https://openfontlicense.org/open-font-license-official-text/
+Los archivos .woff2 provienen del repositorio anterior de VexlowHQ (fonts/). Verifica
+que son las versiones oficiales antes de producción si tienes dudas sobre su origen.
