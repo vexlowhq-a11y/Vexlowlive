@@ -219,6 +219,30 @@ body.fondo-verde { background: var(--verde-chroma); }
 }
 .cinta-mensaje.cambia { animation: entrar .5s ease both; }
 
+/* ---------- Anuncio ---------- */
+.anuncio {
+  position: absolute; left: 50px; right: 50px; top: 300px;
+  z-index: 5;
+  padding: 50px 46px;
+  background: linear-gradient(135deg, var(--marca), #8A5CFF);
+  border: 5px solid var(--blanco);
+  border-radius: 44px;
+  box-shadow: 0 30px 90px rgba(91,63,217,.7);
+  text-align: center;
+  opacity: 0;
+  transform: scale(.7) rotate(-3deg);
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,1.6,.4,1);
+  pointer-events: none;
+}
+.anuncio.activo { opacity: 1; transform: none; }
+.anuncio p {
+  font-family: "Bungee", sans-serif;
+  font-size: 76px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-shadow: 5px 5px 0 rgba(0,0,0,.3);
+}
+
 /* ---------- Ayuda ---------- */
 .ayuda {
   position: absolute; top: 260px; left: 140px; right: 140px;

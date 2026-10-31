@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#16151F">
+  <title>Panel Vexlow Live</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/control.css">
+</head>
+<body>
+  <header class="cabecera">
+    <img src="img/logo.svg" alt="">
+    <h1>Panel del live</h1>
+    <span class="estado" id="estado-conexion">Conectando…</span>
+  </header>
+
+  <main>
+    <section class="bloque">
+      <h2>Escena</h2>
+      <div class="escenas" id="escenas">
+        <button data-escena="inicio"><b>1</b>Inicio</button>
+        <button data-escena="juego"><b>2</b>Juego</button>
+        <button data-escena="pausa"><b>3</b>Pausa</button>
+        <button data-escena="cierre"><b>4</b>Cierre</button>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <h2>Juego en pantalla</h2>
+      <div class="juegos" id="juegos"></div>
+    </section>
+
+    <section class="bloque">
+      <h2>Cuenta regresiva</h2>
+      <div class="cuenta" id="cuenta">--:--</div>
+      <div class="fila">
+        <button data-cuenta="-1">−1 min</button>
+        <button data-cuenta="reiniciar">Reiniciar</button>
+        <button data-cuenta="+1">+1 min</button>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <h2>Anuncio en pantalla</h2>
+      <form class="anuncio" id="form-anuncio">
+        <input id="anuncio-texto" maxlength="80" placeholder="Ej: ¡Gracias por los likes!" autocomplete="off">
+        <button type="submit">Mostrar</button>
+      </form>
+      <div class="fila rapidos" id="rapidos"></div>
+      <button class="secundario" id="quitar-anuncio">Quitar anuncio</button>
+    </section>
+
+    <section class="bloque">
+      <label class="interruptor">
+        <input type="checkbox" id="cinta">
+        <span>Cinta de mensajes abajo</span>
+      </label>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="js/conexion.js"></script>
+  <script src="js/control.js"></script>
+</body>
+</html>

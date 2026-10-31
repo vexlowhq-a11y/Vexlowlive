@@ -37,24 +37,40 @@ y mensajes de la cinta. Para agregar un juego, poné su ícono en `img/` y sumá
 ?ayuda                 abre la ayuda
 ```
 
+## Panel de control (desde el celular)
+
+`control.html` maneja el overlay en tiempo real: escena, juego, cuenta regresiva,
+cinta y **anuncios grandes** (texto que aparece 8 segundos en el live, con botones rápidos
+que se editan en `anunciosRapidos` de `config.js`).
+
+Para que funcione hay que abrir todo con el servidor incluido (necesita Node, sin instalar nada más):
+
+```
+node server.js
+```
+
+o doble clic en **`iniciar-live.bat`**. La consola muestra los links, por ejemplo:
+
+```
+Overlay:  http://192.168.1.69:4800/
+Panel:    http://192.168.1.69:4800/control.html
+```
+
+Las teclas del overlay siguen funcionando y también se ven reflejadas en el panel.
+Si alguna vez no conecta: permitir Node en el firewall de Windows para redes privadas.
+
 ## Uso con dos PCs
 
-**Probar en la red de casa:** en la PC 1 correr
+- **PC 1:** corre `iniciar-live.bat` y la deja prendida durante el live.
+- **PC 2 (la del live):** usa el link del *Overlay*.
+- **Celular** (en el mismo Wi-Fi): abre el link del *Panel*.
 
-```
-python -m http.server 4800 --bind 0.0.0.0
-```
-
-dentro de esta carpeta y en la PC 2 abrir `http://<IP-de-la-PC-1>:4800`.
-(Si no carga, permitir Python en el firewall de Windows para redes privadas.)
-
-**Para los lives:** publicar este repo como proyecto aparte en Vercel
-(Add New → Project → Vexlowlive, sin build) y usar la URL `*.vercel.app`.
-
-**En la PC 2 (la del live):**
+**En la PC 2:**
 
 - **OBS:** Fuente → Navegador → URL del overlay, ancho 1080, alto 1920.
   El fondo queda transparente; poné la captura del juego *debajo* del overlay.
-  Para usar las teclas: clic derecho en la fuente → *Interactuar*.
 - **TikTok LIVE Studio u otro programa sin fondo transparente:** abrir el overlay con
   `?fondo=verde`, capturarlo y aplicarle filtro de chroma key verde.
+
+**Publicado en Vercel** (proyecto aparte, sin build) el overlay funciona con teclas,
+pero el panel de control necesita `server.js`, que Vercel no corre.

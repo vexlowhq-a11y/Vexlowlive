@@ -35,4 +35,12 @@ window.LIVE_CONFIG = {
     "Escribí en el chat qué nivel jugamos",
     "Seguinos para más lives de juegos",
   ],
+
+  // Botones de anuncio rápido en el panel de control (se ven 8 segundos)
+  anunciosRapidos: [
+    "¡Gracias por los likes! ❤️",
+    "¡Bienvenidos!",
+    "¡Nivel superado! 🎉",
+    "¡Seguinos! 👆",
+  ],
 };

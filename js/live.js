@@ -2,6 +2,7 @@
   "use strict";
 
   var cfg = window.LIVE_CONFIG;
+  var C = window.VexlowConexion;
   var ESCENAS = ["inicio", "juego", "pausa", "cierre"];
   var params = new URLSearchParams(location.search);
 
@@ -10,7 +11,9 @@
     juego: 0,
     finCuenta: 0,
     cinta: params.get("cinta") !== "no",
+    anuncio: null,
   };
+  var conectado = false;
 
   // ---------- Guardado local (para que un F5 no te cambie la escena) ----------
   function guardar() {
@@ -91,12 +94,12 @@
   // ---------- Cuenta regresiva ----------
   var cuentaEl = document.getElementById("cuenta");
   function reiniciarCuenta(min) {
-    estado.finCuenta = Date.now() + min * 60000;
+    estado.finCuenta = C.ahora() + min * 60000;
     guardar();
     tic();
   }
   function tic() {
-    var resto = Math.max(0, Math.ceil((estado.finCuenta - Date.now()) / 1000));
+    var resto = Math.max(0, Math.ceil((estado.finCuenta - C.ahora()) / 1000));
     if (resto === 0) {
       cuentaEl.textContent = "¡YA!";
       cuentaEl.classList.add("ya");
@@ -122,6 +125,32 @@
     guardar();
   }
 
+  // ---------- Anuncio (texto grande que manda el panel) ----------
+  var anuncioEl = document.getElementById("anuncio");
+  var anuncioTexto = document.getElementById("anuncio-texto");
+  function revisarAnuncio() {
+    var a = estado.anuncio;
+    var visible = !!(a && a.texto && C.ahora() < a.hasta);
+    if (visible && anuncioTexto.textContent !== a.texto) anuncioTexto.textContent = a.texto;
+    anuncioEl.classList.toggle("activo", visible);
+  }
+
+  // ---------- Panel de control remoto ----------
+  function aplicarRemoto(nuevo) {
+    // El servidor recién arrancó y no tiene estado: le pasamos el nuestro
+    if (!nuevo) { conectado = true; avisarPanel(); return; }
+    if (nuevo.juego !== estado.juego && typeof nuevo.juego === "number") mostrarJuego(nuevo.juego);
+    if (nuevo.escena !== estado.escena) mostrarEscena(nuevo.escena);
+    if (typeof nuevo.finCuenta === "number") { estado.finCuenta = nuevo.finCuenta; tic(); }
+    if (typeof nuevo.cinta === "boolean" && nuevo.cinta !== estado.cinta) { estado.cinta = nuevo.cinta; aplicarCinta(); }
+    estado.anuncio = nuevo.anuncio || null;
+    guardar();
+    revisarAnuncio();
+  }
+  function avisarPanel() {
+    if (conectado) C.enviar(estado);
+  }
+
   // ---------- Teclado ----------
   var ayuda = document.getElementById("ayuda");
   document.addEventListener("keydown", function (e) {
@@ -130,12 +159,13 @@
     else if (k === "ArrowRight") mostrarJuego(estado.juego + 1);
     else if (k === "ArrowLeft") mostrarJuego(estado.juego - 1);
     else if (k === "r" || k === "R") reiniciarCuenta(cfg.cuentaMinutos);
-    else if (k === "+") { estado.finCuenta = Math.max(estado.finCuenta, Date.now()) + 60000; guardar(); tic(); }
-    else if (k === "-") { estado.finCuenta = Math.max(Date.now(), estado.finCuenta - 60000); guardar(); tic(); }
+    else if (k === "+") { estado.finCuenta = Math.max(estado.finCuenta, C.ahora()) + 60000; guardar(); tic(); }
+    else if (k === "-") { estado.finCuenta = Math.max(C.ahora(), estado.finCuenta - 60000); guardar(); tic(); }
     else if (k === "t" || k === "T") { estado.cinta = !estado.cinta; aplicarCinta(); }
     else if (k === "h" || k === "H" || k === "?") ayuda.hidden = !ayuda.hidden;
     else return;
     e.preventDefault();
+    avisarPanel();
   });
 
   // ---------- Arranque ----------
@@ -158,5 +188,6 @@
   aplicarCinta();
   siguienteMensaje();
   setInterval(siguienteMensaje, 6000);
-  setInterval(tic, 250);
+  setInterval(function () { tic(); revisarAnuncio(); }, 250);
+  C.escuchar(aplicarRemoto, function (ok) { conectado = !!ok; });
 })();
