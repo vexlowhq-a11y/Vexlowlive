@@ -97,6 +97,15 @@ const servidor = http.createServer((req, res) => {
 // Mantiene vivas las conexiones (algunos routers cortan las que están quietas)
 setInterval(() => { for (const res of oyentes) res.write(": ping\n\n"); }, 20000);
 
+servidor.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.log("El puerto " + PUERTO + " ya está en uso.");
+    console.log("Probablemente Vexlow Live ya está abierto en otra ventana: cerrala y volvé a abrir este.");
+    process.exit(1);
+  }
+  throw err;
+});
+
 servidor.listen(PUERTO, "0.0.0.0", () => {
   const ips = Object.values(os.networkInterfaces()).flat()
     .filter((i) => i && i.family === "IPv4" && !i.internal)
