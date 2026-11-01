@@ -177,6 +177,30 @@
 
   function avisoAudio(t) { document.getElementById("estado-audio").textContent = t; }
 
+  // Medidores de volumen: si la barra no se mueve, no está entrando sonido
+  var ctxAudio = null;
+  var analizadores = {};
+  function medir() {
+    ["sistema", "mic"].forEach(function (tipo) {
+      var barra = document.querySelector('[data-medidor="' + tipo + '"]');
+      var s = streams[tipo];
+      if (!s) { delete analizadores[tipo]; barra.style.width = "0"; return; }
+      var an = analizadores[tipo];
+      if (!an || an.stream !== s) {
+        ctxAudio = ctxAudio || new AudioContext();
+        var nodo = ctxAudio.createAnalyser();
+        nodo.fftSize = 256;
+        ctxAudio.createMediaStreamSource(s).connect(nodo);
+        an = analizadores[tipo] = { stream: s, nodo: nodo, datos: new Uint8Array(nodo.fftSize) };
+      }
+      an.nodo.getByteTimeDomainData(an.datos);
+      var pico = 0;
+      for (var i = 0; i < an.datos.length; i++) pico = Math.max(pico, Math.abs(an.datos[i] - 128));
+      barra.style.width = Math.min(100, pico / 128 * 250) + "%";
+    });
+  }
+  setInterval(medir, 100);
+
   function leerAjustes() {
     document.querySelectorAll(".fuente").forEach(function (card) {
       var f = { recorte: {} };

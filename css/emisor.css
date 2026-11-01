@@ -39,6 +39,14 @@ select {
 .fila2 button.principal { background: var(--marca); border-color: var(--lila); }
 button.activo { background: var(--marca); border-color: var(--lila); }
 
+.medidores {
+  display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center;
+  margin-top: 14px;
+  font-size: 14px; font-weight: 700; color: var(--apagado);
+}
+.medidor { height: 12px; border-radius: 999px; background: var(--papel); overflow: hidden; }
+.medidor i { display: block; height: 100%; width: 0; background: var(--verde); transition: width .08s; }
+
 details { margin-top: 12px; }
 summary { cursor: pointer; color: var(--apagado); font-weight: 700; }
 .recortes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-top: 10px; }

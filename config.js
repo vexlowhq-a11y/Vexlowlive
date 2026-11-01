@@ -18,7 +18,7 @@ window.LIVE_CONFIG = {
       nombre: "Word Search",
       icono: "img/word-search.png",
       frase: "Encontrá todas las palabras",
-      donde: "Jugá gratis: vexlowhq.com",
+      donde: "",
     },
     {
       nombre: "Aqua Sort",
@@ -45,6 +45,7 @@ window.LIVE_CONFIG = {
     "🎁 ¡LLENEMOS LA META!",
     "💬 COMENTÁ QUÉ HAGO",
   ],
+  tituloJuego: "",     // nombre del juego arriba (también se cambia desde el panel)
   reto: "Ganarle a Yugi un duelo",
   metaRegalos: 1000,   // diamantes
 

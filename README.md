@@ -82,12 +82,27 @@ Si alguna vez no conecta: permitir Node en el firewall de Windows para redes pri
 
 **2. PC 2 (la del live)**
 
-- TikTok LIVE Studio → agregar fuente **Enlace** con `http://<IP-de-la-PC-1>:4800/`
-  a pantalla completa (1080×1920). Esa sola fuente ya trae todo.
-- Si en el live no se escucha el juego: agregá en LIVE Studio el audio del escritorio
-  o abrí el mismo link en Chrome en la PC 2. Para no escucharlo doble: `?sonido=no`.
-- **Regalos y seguidores reales:** abrí la app de escritorio de **TikFinity** en la PC 2.
-  El overlay la detecta solo (`ws://localhost:21213`).
+TikTok LIVE Studio **no acepta direcciones IP** en la fuente Enlace, pero sí `localhost`.
+Por eso en la PC 2 se usa el **puente**:
+
+1. Copiá la carpeta `puente-pc2` a la PC 2 (es lo único que necesita, no hace falta Node).
+2. Doble clic en `INICIAR-PUENTE.bat`. La primera vez pide la IP de la PC 1
+   (la que muestra `iniciar-live.bat`, por ej. `192.168.1.69`) y la recuerda en `ip-pc1.txt`.
+   Si la IP cambia, borrá ese archivo y volvé a abrirlo.
+3. En TikTok LIVE Studio: fuente **Enlace** → `http://localhost:4800/` con **Activar sonido**
+   encendido, a pantalla completa (1080×1920). Esa sola fuente ya trae todo.
+4. **Regalos y seguidores reales:** abrí la app de escritorio de **TikFinity** en la PC 2.
+   El overlay la detecta solo (`ws://localhost:21213`).
+
+**Si algo no llega**, abrí en Chrome de la PC 2 `http://localhost:4800/?escena=juego&diag`:
+abajo aparece qué llega (conexión, imagen del juego, VTuber, sonido del juego, micrófono).
+
+- *Sonido "no llega":* en el emisor de la PC 1 tocá **Sonido del juego** y elegí
+  **Pantalla completa** con **Compartir audio del sistema** marcado (con una ventana sola
+  Windows no deja compartir el sonido). La barrita verde del emisor tiene que moverse.
+- *Sonido "BLOQUEADO":* el navegador espera un clic; tocá la página una vez.
+  En LIVE Studio, si no se escucha, agregá también el audio del escritorio de la PC 2.
+- Para no escucharlo dos veces en una pestaña de prueba: `?sonido=no`.
 
 **3. Celular** (mismo Wi-Fi): `http://<IP-de-la-PC-1>:4800/control.html`
 para cambiar escena, muertes, reto, título, frase gancho, meta de regalos y anuncios.

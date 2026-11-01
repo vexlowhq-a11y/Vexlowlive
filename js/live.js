@@ -151,8 +151,7 @@
   }
 
   function pintarTitulo() {
-    var j = cfg.juegos[estado.juego];
-    document.getElementById("titulo-juego").textContent = remoto.titulo || (j ? j.nombre : "");
+    document.getElementById("titulo-juego").textContent = remoto.titulo || cfg.tituloJuego || "";
   }
 
   var muertesEl = document.getElementById("muertes");

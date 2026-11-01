@@ -49,7 +49,7 @@ window.VexlowReceptor = (function () {
         var a = audios[slot] || (audios[slot] = new Audio());
         a.srcObject = s;
         a.muted = !conSonido;
-        a.play().catch(function () {});
+        reproducir(a);
       }
     };
     pc.onicecandidate = function (e) { if (e.candidate) C.senal(emisor, "ice", e.candidate.toJSON()); };
@@ -64,6 +64,19 @@ window.VexlowReceptor = (function () {
       .then(function () { C.senal(emisor, "respuesta", este.localDescription.toJSON()); })
       .catch(function () {});
   }
+
+  // El navegador puede bloquear el sonido hasta que alguien toque la página.
+  // En ese caso mostramos un botón; con un clic en cualquier lado se destraba.
+  var botonSonido = document.getElementById("activar-sonido");
+  function reproducir(a) {
+    a.play().then(function () { botonSonido.hidden = true; })
+      .catch(function () { if (conSonido) botonSonido.hidden = false; });
+  }
+  function destrabar() {
+    Object.keys(audios).forEach(function (slot) { reproducir(audios[slot]); });
+  }
+  document.addEventListener("pointerdown", destrabar);
+  document.addEventListener("keydown", destrabar);
 
   function limpiar() {
     Object.keys(lugares).forEach(function (slot) {
@@ -121,6 +134,25 @@ window.VexlowReceptor = (function () {
       else if (dist < 20000) d[i + 3] = (dist - 9000) / 11000 * 255; // borde suave
     }
     ctx.putImageData(img, x, y);
+  }
+
+  // ?diag muestra arriba a la izquierda qué está llegando (para revisar en la PC 2)
+  if (params.has("diag")) {
+    var diag = document.createElement("pre");
+    diag.className = "diag";
+    document.getElementById("escenario").appendChild(diag);
+    setInterval(function () {
+      var lineas = ["Conexión con PC 1: " + (pc ? pc.connectionState : "sin emisor")];
+      Object.keys(lugares).forEach(function (slot) {
+        var v = lugares[slot].video;
+        lineas.push("Imagen " + slot + ": " + (v.srcObject ? v.videoWidth + "x" + v.videoHeight : "no llega"));
+      });
+      ["sistema", "mic"].forEach(function (slot) {
+        var a = audios[slot];
+        lineas.push("Sonido " + slot + ": " + (!a || !a.srcObject ? "no llega" : a.muted ? "silenciado (?sonido=no)" : a.paused ? "BLOQUEADO (tocá la página)" : "sonando"));
+      });
+      diag.textContent = lineas.join("\n");
+    }, 500);
   }
 
   var activo = false;
