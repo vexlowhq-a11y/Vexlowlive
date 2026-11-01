@@ -105,6 +105,9 @@ button.activo { background: var(--marca); border-color: var(--lila); }
   margin-bottom: 12px;
 }
 .fila { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fila.dos { grid-template-columns: 1fr 1fr; }
+.fila .grande { background: var(--marca); border-color: var(--lila); font-size: 20px; }
+.resumen { margin-bottom: 10px; font-size: 20px; font-weight: 800; }
 
 .anuncio { display: flex; gap: 8px; margin-bottom: 10px; }
 .anuncio input {

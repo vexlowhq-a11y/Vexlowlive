@@ -22,7 +22,65 @@
     if (!estado) return;
     Object.assign(estado, cambios);
     pintar();
-    C.enviar(estado).catch(function () { marcarConexion(false); });
+    C.enviar(cambios).catch(function () { marcarConexion(false); });
+  }
+
+  // ---------- Muertes, textos y regalos ----------
+  document.querySelectorAll("[data-muertes]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var v = b.dataset.muertes, m = estado.muertes || 0;
+      cambiar({ muertes: v === "0" ? 0 : Math.max(0, m + (+v)) });
+    });
+  });
+
+  document.querySelectorAll("[data-texto]").forEach(function (form) {
+    var input = form.querySelector("input");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var v = input.value.trim();
+      var campo = form.dataset.texto;
+      if (campo === "reto") cambiar({ reto: { texto: v, hecho: false } });
+      else if (campo === "meta") {
+        if (+v > 0) cambiar({ regalos: Object.assign({}, regalos(), { meta: +v }) });
+      } else {
+        var c = {};
+        c[campo] = v;
+        cambiar(c);
+      }
+      input.blur();
+    });
+  });
+
+  var retoHecho = document.getElementById("reto-hecho");
+  retoHecho.addEventListener("change", function () {
+    cambiar({ reto: Object.assign({ texto: cfg.reto }, estado.reto, { hecho: retoHecho.checked }) });
+  });
+
+  function regalos() {
+    return Object.assign({ meta: cfg.metaRegalos || 1000, diamantes: 0, top: [] }, estado && estado.regalos);
+  }
+  document.getElementById("reiniciar-regalos").addEventListener("click", function () {
+    if (!confirm("¿Poner los regalos en cero?")) return;
+    cambiar({ regalos: { meta: regalos().meta, diamantes: 0, top: [], ultimo: null } });
+  });
+  document.getElementById("simular-regalo").addEventListener("click", function () {
+    C.evento({
+      event: "gift",
+      data: { msgId: "prueba-" + Date.now(), nickname: "Prueba", giftName: "Rosa", repeatCount: 1, diamondCount: 1, giftType: 2 },
+    });
+  });
+
+  // Rellena los campos de texto con lo que está en pantalla (solo si no estás escribiendo)
+  function pintarTextos() {
+    var valores = {
+      titulo: estado.titulo || "",
+      gancho: estado.gancho || "",
+      reto: (estado.reto && estado.reto.texto) || cfg.reto || "",
+      meta: regalos().meta,
+    };
+    document.querySelectorAll("[data-texto] input").forEach(function (input) {
+      if (document.activeElement !== input) input.value = valores[input.closest("form").dataset.texto];
+    });
   }
 
   // ---------- Botones ----------
@@ -86,6 +144,12 @@
       b.classList.toggle("activo", +b.dataset.juego === estado.juego);
     });
     cintaEl.checked = !!estado.cinta;
+    document.getElementById("muertes").textContent = estado.muertes || 0;
+    retoHecho.checked = !!(estado.reto && estado.reto.hecho);
+    var r = regalos();
+    document.getElementById("resumen-regalos").textContent = r.diamantes + " / " + r.meta + " 💎"
+      + (r.top.length ? " · Top: " + r.top.slice(0, 3).map(function (t) { return t.nombre; }).join(", ") : "");
+    pintarTextos();
     tic();
   }
 

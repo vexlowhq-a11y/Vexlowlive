@@ -25,19 +25,55 @@
       </div>
     </section>
 
-    <!-- ESCENA 2: JUEGO (el centro queda libre para capturar el juego) -->
+    <!-- ESCENA 2: JUEGO. Las ventanas llegan desde la PC del juego (emisor.html).
+         La parte de abajo queda libre: ahí TikTok pone los comentarios. -->
     <section class="escena" data-escena="juego">
-      <header class="barra-sup">
-        <img class="logo-chico" src="img/logo.svg" alt="">
-        <span class="marca-chica" data-marca></span>
-        <span class="en-vivo"><i></i>EN VIVO</span>
+      <header class="gancho">
+        <div class="gancho-fila">
+          <span class="en-vivo"><i></i>EN VIVO</span>
+          <span class="titulo-juego" id="titulo-juego"></span>
+        </div>
+        <div class="gancho-texto" id="gancho-texto"></div>
       </header>
-      <div class="hueco"></div>
-      <div class="tarjeta-juego">
-        <img data-juego-icono alt="">
+
+      <div class="caja caja-juego">
+        <canvas data-lienzo="juego" width="1008" height="690"></canvas>
+        <p class="vacio">Esperando el juego…</p>
+      </div>
+
+      <div class="fila-media">
+        <div class="caja caja-vtuber">
+          <canvas data-lienzo="vtuber" width="420" height="440"></canvas>
+          <p class="vacio">VTuber</p>
+        </div>
+        <div class="columna">
+          <div class="tarjeta tarjeta-reto">
+            <h3>🏆 Reto de hoy</h3>
+            <p id="reto-texto"></p>
+          </div>
+          <div class="tarjeta tarjeta-muertes">
+            <h3>💀 Muertes</h3>
+            <b id="muertes">0</b>
+          </div>
+          <div class="tarjeta tarjeta-meta">
+            <h3>🎁 Meta de regalos</h3>
+            <div class="barra"><i id="meta-relleno"></i></div>
+            <span id="meta-texto">0 / 1000 💎</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tira-regalos">
+        <div class="ultimo-regalo" id="ultimo-regalo">Mandá un regalo y aparecés acá 👀</div>
+        <ol class="top" id="top-regalos"></ol>
+      </div>
+
+      <!-- Alerta de regalo / seguidor (TikFinity) -->
+      <div class="alerta" id="alerta">
+        <img id="alerta-icono" alt="">
         <div>
-          <strong data-juego-nombre></strong>
-          <span data-juego-frase></span>
+          <strong id="alerta-nombre"></strong>
+          <span id="alerta-texto"></span>
         </div>
       </div>
     </section>
@@ -92,6 +128,7 @@
 
   <script src="config.js"></script>
   <script src="js/conexion.js"></script>
+  <script src="js/receptor.js"></script>
   <script src="js/live.js"></script>
 </body>
 </html>

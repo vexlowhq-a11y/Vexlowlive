@@ -1,7 +1,13 @@
 # Vexlow Live
 
-Overlay para los lives de TikTok: logo, juegos, cuenta regresiva y mensajes.
-Es una página web estática (HTML + CSS + JS, sin instalar nada) en formato vertical **1080×1920**.
+Estudio web para los lives de TikTok, pensado para **dos PCs**:
+
+- **PC 1 (la del juego, la vieja):** solo juega y comparte las ventanas (emulador, veadotube)
+  y el sonido desde una pestaña del navegador. No corre TikTok LIVE Studio.
+- **PC 2 (la del live):** TikTok LIVE Studio con **una sola fuente "Enlace"** que ya muestra todo
+  armado: juego, VTuber, reto, muertes, meta de regalos y alertas.
+
+Formato vertical **1080×1920**, fondo negro.
 
 > Proyecto **separado** de vexlowhq.com: otro repo, otro dominio y marcado como `noindex`
 > (no aparece en Google y no afecta a la web principal ni a su monetización).
@@ -11,7 +17,7 @@ Es una página web estática (HTML + CSS + JS, sin instalar nada) en formato ver
 | Tecla | Escena  | Para qué |
 |-------|---------|----------|
 | `1`   | Inicio  | Logo + "Empezamos en" con cuenta regresiva |
-| `2`   | Juego   | Marco con barra "EN VIVO", tarjeta del juego y cinta. El centro queda libre para el juego |
+| `2`   | Juego   | Frase gancho, ventana del juego, VTuber, reto, muertes, meta de regalos y últimos regalos |
 | `3`   | Pausa   | "Ya volvemos..." |
 | `4`   | Cierre  | "¡Gracias por ver!" + vitrina de juegos |
 
@@ -22,8 +28,8 @@ La página recuerda la última escena, así que si se recarga no se pierde.
 
 ## Editar textos y juegos
 
-Todo está en **`config.js`**: nombre, usuario de TikTok, minutos de la cuenta, lista de juegos
-y mensajes de la cinta. Para agregar un juego, poné su ícono en `img/` y sumá una entrada a `juegos`.
+Todo está en **`config.js`**: nombre, usuario de TikTok, minutos de la cuenta, lista de juegos,
+mensajes de la cinta, frases gancho, reto y meta de regalos. Para agregar un juego, poné su ícono en `img/` y sumá una entrada a `juegos`.
 
 ## Opciones por URL
 
@@ -59,18 +65,40 @@ Panel:    http://192.168.1.69:4800/control.html
 Las teclas del overlay siguen funcionando y también se ven reflejadas en el panel.
 Si alguna vez no conecta: permitir Node en el firewall de Windows para redes privadas.
 
-## Uso con dos PCs
+## Uso con dos PCs (paso a paso)
 
-- **PC 1:** corre `iniciar-live.bat` y la deja prendida durante el live.
-- **PC 2 (la del live):** usa el link del *Overlay*.
-- **Celular** (en el mismo Wi-Fi): abre el link del *Panel*.
+**1. PC 1 (la del juego)**
 
-**En la PC 2:**
+1. Doble clic en `iniciar-live.bat` (dejá la ventana negra abierta).
+2. En **Chrome o Edge** abrí `http://localhost:4800/emisor.html`
+   (tiene que ser *localhost*: el navegador solo deja compartir ventanas así).
+3. **Juego → Elegir ventana** → elegí la ventana del emulador.
+4. **VTuber → Elegir ventana** → elegí veadotube. Poné en veadotube un fondo verde liso:
+   el overlay lo borra ("Quitar fondo de color").
+5. **Sonido del juego** → elegí *Pantalla completa* y marcá *Compartir audio del sistema*.
+   (Opcional: **Micrófono**, si el micro está enchufado en esta PC.)
+6. Si hay bordes de más (barra de título), usá *Recortar bordes*.
+7. Si la PC se traba, bajá la calidad a 480p.
 
-- **OBS:** Fuente → Navegador → URL del overlay, ancho 1080, alto 1920.
-  El fondo queda transparente; poné la captura del juego *debajo* del overlay.
-- **TikTok LIVE Studio u otro programa sin fondo transparente:** abrir el overlay con
-  `?fondo=verde`, capturarlo y aplicarle filtro de chroma key verde.
+**2. PC 2 (la del live)**
 
-**Publicado en Vercel** (proyecto aparte, sin build) el overlay funciona con teclas,
-pero el panel de control necesita `server.js`, que Vercel no corre.
+- TikTok LIVE Studio → agregar fuente **Enlace** con `http://<IP-de-la-PC-1>:4800/`
+  a pantalla completa (1080×1920). Esa sola fuente ya trae todo.
+- Si en el live no se escucha el juego: agregá en LIVE Studio el audio del escritorio
+  o abrí el mismo link en Chrome en la PC 2. Para no escucharlo doble: `?sonido=no`.
+- **Regalos y seguidores reales:** abrí la app de escritorio de **TikFinity** en la PC 2.
+  El overlay la detecta solo (`ws://localhost:21213`).
+
+**3. Celular** (mismo Wi-Fi): `http://<IP-de-la-PC-1>:4800/control.html`
+para cambiar escena, muertes, reto, título, frase gancho, meta de regalos y anuncios.
+
+La zona de abajo (desde ~1550 px) queda libre a propósito: ahí TikTok muestra los comentarios.
+
+### Cómo viaja la imagen
+
+Las ventanas viajan de la PC 1 a la PC 2 por **WebRTC dentro de la red de casa** (no sale a
+internet). `server.js` solo hace de intermediario para conectarlas y guardar el estado.
+Conviene usar cable de red en al menos una de las dos PCs.
+
+**Publicado en Vercel** (proyecto aparte, sin build) solo funcionan las escenas con teclado:
+el panel, el emisor y los regalos necesitan `server.js`.

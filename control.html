@@ -33,6 +33,49 @@
     </section>
 
     <section class="bloque">
+      <h2>💀 Muertes</h2>
+      <div class="cuenta" id="muertes">0</div>
+      <div class="fila">
+        <button data-muertes="-1">−1</button>
+        <button data-muertes="0">A cero</button>
+        <button data-muertes="+1" class="grande">+1</button>
+      </div>
+    </section>
+
+    <section class="bloque">
+      <h2>Textos de la escena de juego</h2>
+      <form class="anuncio" data-texto="titulo">
+        <input maxlength="40" placeholder="Nombre del juego" autocomplete="off">
+        <button type="submit">Poner</button>
+      </form>
+      <form class="anuncio" data-texto="gancho">
+        <input maxlength="32" placeholder="Frase de arriba fija (vacío = rotan)" autocomplete="off">
+        <button type="submit">Poner</button>
+      </form>
+      <form class="anuncio" data-texto="reto">
+        <input maxlength="60" placeholder="Reto de hoy" autocomplete="off">
+        <button type="submit">Poner</button>
+      </form>
+      <label class="interruptor">
+        <input type="checkbox" id="reto-hecho">
+        <span>Reto cumplido ✅</span>
+      </label>
+    </section>
+
+    <section class="bloque">
+      <h2>🎁 Regalos</h2>
+      <p class="resumen" id="resumen-regalos">0 / 1000 💎</p>
+      <form class="anuncio" data-texto="meta">
+        <input type="number" min="1" inputmode="numeric" placeholder="Meta en diamantes" autocomplete="off">
+        <button type="submit">Poner</button>
+      </form>
+      <div class="fila dos">
+        <button id="simular-regalo">Probar alerta</button>
+        <button id="reiniciar-regalos">Reiniciar regalos</button>
+      </div>
+    </section>
+
+    <section class="bloque">
       <h2>Cuenta regresiva</h2>
       <div class="cuenta" id="cuenta">--:--</div>
       <div class="fila">

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Emisor Vexlow Live</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/control.css">
+  <link rel="stylesheet" href="css/emisor.css">
+</head>
+<body>
+  <header class="cabecera">
+    <img src="img/logo.svg" alt="">
+    <h1>Emisor · esta PC</h1>
+    <span class="estado" id="estado-conexion">Conectando…</span>
+  </header>
+
+  <main class="emisor">
+    <p class="aviso" id="aviso-localhost" hidden>
+      Abrí esta página con <b>http://localhost:4800/emisor.html</b> en esta PC:
+      el navegador solo deja compartir ventanas desde localhost.
+    </p>
+
+    <section class="bloque">
+      <h2>Envío a la PC del live</h2>
+      <p class="ayuda-texto">Overlays conectados: <b id="receptores">0</b></p>
+      <label class="campo">Calidad
+        <select id="calidad">
+          <option value="720">720p · 30 fps (recomendado)</option>
+          <option value="480">480p · 30 fps (si la PC se traba)</option>
+          <option value="1080">1080p · 30 fps</option>
+        </select>
+      </label>
+    </section>
+
+    <!-- Una tarjeta por cada lugar del overlay -->
+    <section class="bloque fuente" data-slot="juego">
+      <h2>🎮 Juego (ventana del emulador)</h2>
+      <div class="vista"><video muted playsinline></video><span>Sin ventana</span></div>
+      <div class="fila2">
+        <button class="principal" data-accion="elegir">Elegir ventana</button>
+        <button data-accion="quitar">Quitar</button>
+      </div>
+      <details>
+        <summary>Recortar bordes (barra de título, menús)</summary>
+        <div class="recortes">
+          <label>Arriba <input type="range" min="0" max="40" value="0" data-recorte="t"></label>
+          <label>Abajo <input type="range" min="0" max="40" value="0" data-recorte="b"></label>
+          <label>Izquierda <input type="range" min="0" max="40" value="0" data-recorte="l"></label>
+          <label>Derecha <input type="range" min="0" max="40" value="0" data-recorte="r"></label>
+        </div>
+      </details>
+    </section>
+
+    <section class="bloque fuente" data-slot="vtuber">
+      <h2>🧑‍🎤 VTuber (ventana de veadotube)</h2>
+      <div class="vista"><video muted playsinline></video><span>Sin ventana</span></div>
+      <div class="fila2">
+        <button class="principal" data-accion="elegir">Elegir ventana</button>
+        <button data-accion="quitar">Quitar</button>
+      </div>
+      <label class="interruptor">
+        <input type="checkbox" data-chroma checked>
+        <span>Quitar fondo de color</span>
+        <input type="color" value="#00ff00" data-color>
+      </label>
+      <details>
+        <summary>Recortar bordes</summary>
+        <div class="recortes">
+          <label>Arriba <input type="range" min="0" max="40" value="0" data-recorte="t"></label>
+          <label>Abajo <input type="range" min="0" max="40" value="0" data-recorte="b"></label>
+          <label>Izquierda <input type="range" min="0" max="40" value="0" data-recorte="l"></label>
+          <label>Derecha <input type="range" min="0" max="40" value="0" data-recorte="r"></label>
+        </div>
+      </details>
+    </section>
+
+    <section class="bloque">
+      <h2>🔊 Sonido</h2>
+      <div class="fila2">
+        <button data-audio="sistema">Sonido del juego</button>
+        <button data-audio="mic">Micrófono</button>
+      </div>
+      <p class="ayuda-texto" id="estado-audio">Sin sonido.</p>
+      <p class="ayuda-texto">
+        <b>Sonido del juego:</b> elegí <i>Pantalla completa</i> y marcá
+        <i>Compartir audio del sistema</i>; solo se usa el sonido, no la imagen.
+      </p>
+    </section>
+
+    <p class="ayuda-texto pie">
+      Dejá esta pestaña abierta mientras dure el live (puede quedar minimizada).
+    </p>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="js/conexion.js"></script>
+  <script src="js/emisor.js"></script>
+</body>
+</html>

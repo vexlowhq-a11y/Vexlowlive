@@ -3,6 +3,7 @@
 
   var cfg = window.LIVE_CONFIG;
   var C = window.VexlowConexion;
+  var R = window.VexlowReceptor;
   var ESCENAS = ["inicio", "juego", "pausa", "cierre"];
   var params = new URLSearchParams(location.search);
 
@@ -14,6 +15,7 @@
     anuncio: null,
   };
   var conectado = false;
+  var remoto = {};   // lo que manda el panel: reto, muertes, regalos, gancho, título...
 
   // ---------- Guardado local (para que un F5 no te cambie la escena) ----------
   function guardar() {
@@ -74,6 +76,8 @@
     document.querySelectorAll(".escena").forEach(function (el) {
       el.classList.toggle("activa", el.dataset.escena === nombre);
     });
+    escenario.dataset.escena = nombre;
+    R.activar(nombre === "juego");
     guardar();
   }
 
@@ -85,9 +89,7 @@
     rellenar("[data-juego-nombre]", function (el) { el.textContent = j.nombre; });
     rellenar("[data-juego-frase]", function (el) { el.textContent = j.frase; });
     rellenar("[data-juego-donde]", function (el) { el.textContent = j.donde || ""; });
-    // reinicia la animación de entrada de la tarjeta
-    var t = document.querySelector(".tarjeta-juego");
-    t.style.animation = "none"; void t.offsetWidth; t.style.animation = "";
+    pintarTitulo();
     guardar();
   }
 
@@ -135,6 +137,92 @@
     anuncioEl.classList.toggle("activo", visible);
   }
 
+  // ---------- Escena de juego: gancho, reto, muertes y regalos ----------
+  var ganchoEl = document.getElementById("gancho-texto");
+  var iGancho = 0;
+  function siguienteGancho() {
+    var lista = remoto.gancho ? [remoto.gancho] : (cfg.ganchos || []);
+    if (!lista.length) return;
+    var texto = lista[iGancho++ % lista.length];
+    if (ganchoEl.textContent === texto) return;
+    ganchoEl.textContent = texto;
+    ganchoEl.classList.remove("cambia"); void ganchoEl.offsetWidth;
+    ganchoEl.classList.add("cambia");
+  }
+
+  function pintarTitulo() {
+    var j = cfg.juegos[estado.juego];
+    document.getElementById("titulo-juego").textContent = remoto.titulo || (j ? j.nombre : "");
+  }
+
+  var muertesEl = document.getElementById("muertes");
+  function pintarWidgets() {
+    pintarTitulo();
+    var reto = remoto.reto || {};
+    document.getElementById("reto-texto").textContent = reto.texto || cfg.reto || "";
+    document.querySelector(".tarjeta-reto").classList.toggle("hecho", !!reto.hecho);
+
+    var m = String(remoto.muertes || 0);
+    if (muertesEl.textContent !== m) {
+      muertesEl.textContent = m;
+      muertesEl.classList.remove("sube"); void muertesEl.offsetWidth;
+      muertesEl.classList.add("sube");
+    }
+
+    var r = remoto.regalos || {};
+    var meta = r.meta || cfg.metaRegalos || 1000;
+    var dia = r.diamantes || 0;
+    document.getElementById("meta-relleno").style.width = Math.min(100, dia / meta * 100) + "%";
+    document.getElementById("meta-texto").textContent = dia + " / " + meta + " 💎";
+
+    var ult = document.getElementById("ultimo-regalo");
+    if (r.ultimo) {
+      ult.innerHTML = '<img alt=""><span>Último: <b></b> · </span>';
+      var img = ult.querySelector("img");
+      if (r.ultimo.icono) img.src = r.ultimo.icono; else img.remove();
+      ult.querySelector("b").textContent = r.ultimo.nombre;
+      ult.querySelector("span").append(r.ultimo.regalo + " x" + r.ultimo.cantidad);
+    }
+    var top = document.getElementById("top-regalos");
+    top.textContent = "";
+    (r.top || []).slice(0, 3).forEach(function (t) {
+      var li = document.createElement("li");
+      li.textContent = t.nombre;
+      top.appendChild(li);
+    });
+  }
+
+  // Alerta de regalo o seguidor
+  var alertaEl = document.getElementById("alerta");
+  var alertaVista = null;
+  function revisarAlerta() {
+    var a = remoto.alerta;
+    var visible = !!(a && C.ahora() < a.hasta);
+    if (visible && a.id !== alertaVista) {
+      alertaVista = a.id;
+      alertaEl.classList.toggle("seguidor", a.tipo === "seguidor");
+      document.getElementById("alerta-icono").src = a.icono || "";
+      document.getElementById("alerta-nombre").textContent = a.nombre;
+      document.getElementById("alerta-texto").textContent = a.texto;
+    }
+    alertaEl.classList.toggle("activa", visible);
+  }
+
+  // ---------- TikFinity (regalos y seguidores reales) ----------
+  // La app de escritorio de TikFinity, abierta en la PC del live, publica los
+  // eventos en ws://localhost:21213/. Los pasamos al servidor, que los suma.
+  function conectarTikFinity() {
+    var ws;
+    try { ws = new WebSocket(params.get("tikfinity") || "ws://localhost:21213/"); }
+    catch (e) { setTimeout(conectarTikFinity, 5000); return; }
+    ws.onmessage = function (e) {
+      var d;
+      try { d = JSON.parse(e.data); } catch (err) { return; }
+      if (conectado && d && (d.event === "gift" || d.event === "follow")) C.evento(d);
+    };
+    ws.onclose = function () { setTimeout(conectarTikFinity, 5000); };
+  }
+
   // ---------- Panel de control remoto ----------
   function aplicarRemoto(nuevo) {
     // El servidor recién arrancó y no tiene estado: le pasamos el nuestro
@@ -144,9 +232,15 @@
     if (typeof nuevo.finCuenta === "number") { estado.finCuenta = nuevo.finCuenta; tic(); }
     if (typeof nuevo.cinta === "boolean" && nuevo.cinta !== estado.cinta) { estado.cinta = nuevo.cinta; aplicarCinta(); }
     estado.anuncio = nuevo.anuncio || null;
+    remoto = nuevo;
+    R.ajustes(nuevo.fuentes);
     guardar();
     revisarAnuncio();
+    pintarWidgets();
+    revisarAlerta();
+    if (nuevo.gancho !== ganchoFijo) { ganchoFijo = nuevo.gancho; iGancho = 0; siguienteGancho(); }
   }
+  var ganchoFijo;
   function avisarPanel() {
     if (conectado) C.enviar(estado);
   }
@@ -188,6 +282,13 @@
   aplicarCinta();
   siguienteMensaje();
   setInterval(siguienteMensaje, 6000);
-  setInterval(function () { tic(); revisarAnuncio(); }, 250);
-  C.escuchar(aplicarRemoto, function (ok) { conectado = !!ok; });
+  pintarWidgets();
+  siguienteGancho();
+  setInterval(siguienteGancho, 5000);
+  setInterval(function () { tic(); revisarAnuncio(); revisarAlerta(); }, 250);
+  C.escuchar(aplicarRemoto, function (ok) {
+    conectado = !!ok;
+    if (ok) R.pedirImagen();
+  }, "receptor");
+  conectarTikFinity();
 })();
