@@ -37,6 +37,8 @@
     <!-- Una tarjeta por cada lugar del overlay -->
     <section class="bloque fuente" data-slot="juego">
       <h2>🎮 Juego (ventana del emulador)</h2>
+      <p class="ayuda-texto">Al elegir la ventana, encendé <b>«Compartir con audio del sistema»</b>
+        (abajo en el selector) para que también se escuche el juego.</p>
       <div class="vista"><video muted playsinline></video><span>Sin ventana</span></div>
       <div class="fila2">
         <button class="principal" data-accion="elegir">Elegir ventana</button>
@@ -79,7 +81,7 @@
     <section class="bloque">
       <h2>🔊 Sonido</h2>
       <div class="fila2">
-        <button data-audio="sistema">Sonido del juego</button>
+        <button data-audio="sistema">Sonido de la pantalla</button>
         <button data-audio="mic">Micrófono</button>
       </div>
       <div class="medidores">
@@ -88,8 +90,8 @@
       </div>
       <p class="ayuda-texto" id="estado-audio">Sin sonido.</p>
       <p class="ayuda-texto">
-        <b>Sonido del juego:</b> elegí <i>Pantalla completa</i> y marcá
-        <i>Compartir audio del sistema</i>; solo se usa el sonido, no la imagen.
+        El sonido del juego ya va con la ventana del juego. <b>Sonido de la pantalla</b> es solo
+        por si eso no funciona: manda todo lo que suena en la PC.
       </p>
     </section>
 

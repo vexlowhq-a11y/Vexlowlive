@@ -147,7 +147,7 @@ window.VexlowReceptor = (function () {
         var v = lugares[slot].video;
         lineas.push("Imagen " + slot + ": " + (v.srcObject ? v.videoWidth + "x" + v.videoHeight : "no llega"));
       });
-      ["sistema", "mic"].forEach(function (slot) {
+      ["juego", "sistema", "mic"].forEach(function (slot) {
         var a = audios[slot];
         lineas.push("Sonido " + slot + ": " + (!a || !a.srcObject ? "no llega" : a.muted ? "silenciado (?sonido=no)" : a.paused ? "BLOQUEADO (tocá la página)" : "sonando"));
       });

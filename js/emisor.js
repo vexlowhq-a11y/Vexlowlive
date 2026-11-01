@@ -30,12 +30,19 @@
   function elegirVentana(slot) {
     var v = medidas();
     v.displaySurface = "window";
+    // Con el juego pedimos también el sonido: en el selector hay que encender
+    // «Compartir con audio del sistema». Si no se enciende, va solo la imagen.
     navigator.mediaDevices.getDisplayMedia({
       video: v,
-      audio: false,
+      audio: slot === "juego" ? { suppressLocalAudioPlayback: false } : false,
+      systemAudio: slot === "juego" ? "include" : "exclude",
       selfBrowserSurface: "exclude",
       surfaceSwitching: "include",
     }).then(function (s) {
+      if (slot === "juego") {
+        mensajeError = s.getAudioTracks().length ? ""
+          : "El juego se ve pero no se oye: volvé a «Elegir ventana» y encendé «Compartir con audio del sistema».";
+      }
       var pista = s.getVideoTracks()[0];
       pista.contentHint = slot === "juego" ? "motion" : "detail";
       pista.addEventListener("ended", function () { quitar(slot); });
@@ -46,29 +53,48 @@
   function elegirAudio(tipo) {
     var pedido = tipo === "mic"
       ? navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: true } })
-      : navigator.mediaDevices.getDisplayMedia({ video: true, audio: { suppressLocalAudioPlayback: false }, systemAudio: "include" });
+      : navigator.mediaDevices.getDisplayMedia({
+        video: { displaySurface: "monitor", frameRate: { max: 1 }, width: { max: 64 } },
+        audio: { suppressLocalAudioPlayback: false },
+        systemAudio: "include",
+        monitorTypeSurfaces: "include",
+      });
     pedido.then(function (s) {
-      // Del "Sonido del juego" solo queremos el audio: cortamos la imagen
-      s.getVideoTracks().forEach(function (t) { t.stop(); s.removeTrack(t); });
-      if (!s.getAudioTracks().length) {
-        avisoAudio("No llegó sonido: elegí Pantalla completa y marcá «Compartir audio del sistema».");
+      var audio = s.getAudioTracks();
+      if (!audio.length) {
+        s.getTracks().forEach(function (t) { t.stop(); });
+        errorAudio("No llegó sonido: elegí la pestaña «Pantalla completa», tocá tu pantalla y activá «Compartir también el audio del sistema».");
         return;
       }
-      s.getAudioTracks()[0].addEventListener("ended", function () { quitar(tipo); });
-      ponerStream(tipo, s);
-    }).catch(function () {});
+      // Del "Sonido del juego" solo mandamos el audio. La imagen NO se corta
+      // (en Chrome eso corta también el sonido): queda pausada y diminuta.
+      var captura = s;
+      captura.getVideoTracks().forEach(function (t) { t.enabled = false; });
+      var soloAudio = new MediaStream(audio);
+      soloAudio.captura = captura;
+      audio[0].addEventListener("ended", function () { quitar(tipo); });
+      ponerStream(tipo, soloAudio);
+    }).catch(function (e) {
+      if (e && e.name !== "NotAllowedError") errorAudio("No se pudo tomar el sonido (" + e.name + ").");
+    });
+  }
+
+  function detener(s) {
+    s.getTracks().forEach(function (t) { t.stop(); });
+    if (s.captura) s.captura.getTracks().forEach(function (t) { t.stop(); });
   }
 
   function ponerStream(slot, s) {
-    if (streams[slot]) streams[slot].getTracks().forEach(function (t) { t.stop(); });
+    if (streams[slot]) detener(streams[slot]);
     streams[slot] = s;
+    if (slot !== "juego") mensajeError = "";
     pintarFuentes();
     renegociarTodos();
   }
 
   function quitar(slot) {
     if (!streams[slot]) return;
-    streams[slot].getTracks().forEach(function (t) { t.stop(); });
+    detener(streams[slot]);
     delete streams[slot];
     pintarFuentes();
     renegociarTodos();
@@ -110,7 +136,7 @@
   function limitarBitrate(x) {
     var p = x.sender.getParameters();
     if (!p.encodings || !p.encodings.length) return;
-    p.encodings[0].maxBitrate = BITRATE[x.slot];
+    p.encodings[0].maxBitrate = x.kind === "audio" ? BITRATE.sistema : BITRATE[x.slot];
     if (x.kind === "video") p.degradationPreference = x.slot === "juego" ? "maintain-framerate" : "balanced";
     x.sender.setParameters(p).catch(function () {});
   }
@@ -156,6 +182,8 @@
   });
 
   // ---------- Interfaz ----------
+  function conAudio(s) { return !!(s && s.getAudioTracks().length); }
+
   function pintarFuentes() {
     document.querySelectorAll(".fuente").forEach(function (card) {
       var slot = card.dataset.slot;
@@ -168,14 +196,26 @@
       card.querySelector(".vista").classList.toggle("activa", !!s);
     });
     var partes = [];
-    if (streams.sistema) partes.push("sonido del juego");
+    if (conAudio(streams.juego)) partes.push("sonido de la ventana del juego");
+    if (streams.sistema) partes.push("sonido de la pantalla");
     if (streams.mic) partes.push("micrófono");
-    avisoAudio(partes.length ? "Enviando: " + partes.join(" + ") + "." : "Sin sonido.");
+    avisoAudio(mensajeError || (partes.length ? "Enviando: " + partes.join(" + ") + "." : "Sin sonido."));
     document.querySelector('[data-audio="sistema"]').classList.toggle("activo", !!streams.sistema);
     document.querySelector('[data-audio="mic"]').classList.toggle("activo", !!streams.mic);
   }
 
-  function avisoAudio(t) { document.getElementById("estado-audio").textContent = t; }
+  function avisoAudio(t) {
+    var el = document.getElementById("estado-audio");
+    el.textContent = t;
+    el.classList.toggle("error", !!mensajeError);
+  }
+
+  // Los errores quedan a la vista hasta que el sonido se active bien
+  var mensajeError = "";
+  function errorAudio(t) {
+    mensajeError = t;
+    avisoAudio(t);
+  }
 
   // Medidores de volumen: si la barra no se mueve, no está entrando sonido
   var ctxAudio = null;
@@ -183,7 +223,7 @@
   function medir() {
     ["sistema", "mic"].forEach(function (tipo) {
       var barra = document.querySelector('[data-medidor="' + tipo + '"]');
-      var s = streams[tipo];
+      var s = tipo === "sistema" && !streams.sistema && conAudio(streams.juego) ? streams.juego : streams[tipo];
       if (!s) { delete analizadores[tipo]; barra.style.width = "0"; return; }
       var an = analizadores[tipo];
       if (!an || an.stream !== s) {

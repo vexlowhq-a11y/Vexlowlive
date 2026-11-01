@@ -75,7 +75,8 @@ Si alguna vez no conecta: permitir Node en el firewall de Windows para redes pri
 3. **Juego → Elegir ventana** → elegí la ventana del emulador.
 4. **VTuber → Elegir ventana** → elegí veadotube. Poné en veadotube un fondo verde liso:
    el overlay lo borra ("Quitar fondo de color").
-5. **Sonido del juego** → elegí *Pantalla completa* y marcá *Compartir audio del sistema*.
+5. Al elegir la ventana del juego, encendé **«Compartir con audio del sistema»** en el selector:
+   así el sonido del juego viaja junto con la imagen. (*Sonido de la pantalla* queda como plan B.)
    (Opcional: **Micrófono**, si el micro está enchufado en esta PC.)
 6. Si hay bordes de más (barra de título), usá *Recortar bordes*.
 7. Si la PC se traba, bajá la calidad a 480p.
