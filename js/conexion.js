@@ -24,7 +24,11 @@ window.VexlowConexion = (function () {
         };
         es.addEventListener("senal", function (e) { alSenal(JSON.parse(e.data)); });
       })
-      .catch(function () { alCambiarConexion(null); });
+      .catch(function () {
+        // El servidor todavía no está (o se está reiniciando): reintentamos solos
+        alCambiarConexion(null);
+        setTimeout(function () { escuchar(alRecibir, alCambiarConexion, rol); }, 3000);
+      });
   }
 
   function publicar(ruta, datos) {
