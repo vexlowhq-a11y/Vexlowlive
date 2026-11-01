@@ -295,6 +295,7 @@
   // ---------- Arranque ----------
   var primera = true;
   C.escuchar(function (estado) {
+    window.VexlowVolumen.pintar(estado && estado.volumen);
     if (!primera) return;
     primera = false;
     cargarAjustes(estado && estado.fuentes);

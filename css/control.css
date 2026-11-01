@@ -127,3 +127,11 @@ button.activo { background: var(--marca); border-color: var(--lila); }
 
 .interruptor { display: flex; align-items: center; gap: 12px; min-height: 40px; font-weight: 700; cursor: pointer; }
 .interruptor input { width: 24px; height: 24px; accent-color: var(--marca); }
+
+.volumenes { display: grid; gap: 12px; margin-bottom: 12px; }
+.volumenes label {
+  display: grid; grid-template-columns: 110px 1fr 48px; gap: 10px; align-items: center;
+  font-weight: 700;
+}
+.volumenes input { width: 100%; height: 32px; accent-color: var(--marca); }
+.volumenes output { text-align: right; font-variant-numeric: tabular-nums; color: var(--apagado); }

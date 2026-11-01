@@ -84,6 +84,10 @@
         <button data-audio="sistema">Sonido de la pantalla</button>
         <button data-audio="mic">Micrófono</button>
       </div>
+<div class="volumenes">
+        <label><span>🎮 Juego</span><input type="range" min="0" max="100" value="100" data-volumen="juego"><output>100%</output></label>
+        <label><span>🎤 Micrófono</span><input type="range" min="0" max="100" value="100" data-volumen="mic"><output>100%</output></label>
+      </div>
       <div class="medidores">
         <span>Juego</span><div class="medidor"><i data-medidor="sistema"></i></div>
         <span>Micrófono</span><div class="medidor"><i data-medidor="mic"></i></div>
@@ -102,6 +106,7 @@
 
   <script src="config.js"></script>
   <script src="js/conexion.js"></script>
+  <script src="js/volumen.js"></script>
   <script src="js/emisor.js"></script>
 </body>
 </html>

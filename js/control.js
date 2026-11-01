@@ -166,6 +166,7 @@
       return;
     }
     estado = nuevo;
+    window.VexlowVolumen.pintar(nuevo.volumen);
     pintar();
   }, marcarConexion);
   setInterval(tic, 250);

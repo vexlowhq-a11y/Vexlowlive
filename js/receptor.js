@@ -49,6 +49,8 @@ window.VexlowReceptor = (function () {
         var a = audios[slot] || (audios[slot] = new Audio());
         a.srcObject = s;
         a.muted = !conSonido;
+        a.dataset.slot = slot;
+        aplicarVolumen(a);
         reproducir(a);
       }
     };
@@ -63,6 +65,14 @@ window.VexlowReceptor = (function () {
       .then(function (r) { return este.setLocalDescription(r); })
       .then(function () { C.senal(emisor, "respuesta", este.localDescription.toJSON()); })
       .catch(function () {});
+  }
+
+  // Volumen 0-100 que se elige en el emisor o en el panel.
+  // El sonido de la pantalla usa el mismo control que el del juego.
+  var volumen = {};
+  function aplicarVolumen(a) {
+    var v = volumen[a.dataset.slot === "mic" ? "mic" : "juego"];
+    a.volume = v == null ? 1 : Math.max(0, Math.min(100, v)) / 100;
   }
 
   // El navegador puede bloquear el sonido hasta que alguien toque la página.
@@ -149,7 +159,7 @@ window.VexlowReceptor = (function () {
       });
       ["juego", "sistema", "mic"].forEach(function (slot) {
         var a = audios[slot];
-        lineas.push("Sonido " + slot + ": " + (!a || !a.srcObject ? "no llega" : a.muted ? "silenciado (?sonido=no)" : a.paused ? "BLOQUEADO (tocá la página)" : "sonando"));
+        lineas.push("Sonido " + slot + ": " + (!a || !a.srcObject ? "no llega" : a.muted ? "silenciado (?sonido=no)" : a.paused ? "BLOQUEADO (tocá la página)" : "sonando al " + Math.round(a.volume * 100) + "%"));
       });
       diag.textContent = lineas.join("\n");
     }, 500);
@@ -167,5 +177,10 @@ window.VexlowReceptor = (function () {
     // Solo dibujamos cuando la escena de juego está en pantalla
     activar: function (si) { activo = si; },
     ajustes: function (f) { if (f) ajustes = f; },
+    volumen: function (v) {
+      if (!v) return;
+      volumen = v;
+      Object.keys(audios).forEach(function (slot) { aplicarVolumen(audios[slot]); });
+    },
   };
 })();

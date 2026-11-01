@@ -233,6 +233,7 @@
     estado.anuncio = nuevo.anuncio || null;
     remoto = nuevo;
     R.ajustes(nuevo.fuentes);
+    R.volumen(nuevo.volumen);
     guardar();
     revisarAnuncio();
     pintarWidgets();
