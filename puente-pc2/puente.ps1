@@ -9,6 +9,14 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# Windows por defecto permite solo 2 conexiones a la vez hacia otra PC. El overlay
+# deja conexiones en vivo abiertas todo el tiempo, así que con ese límite el resto
+# (archivos, señales de video) quedaba esperando: la página tardaba muchísimo
+# y el juego no llegaba nunca.
+[System.Net.ServicePointManager]::DefaultConnectionLimit = 200
+[System.Net.ServicePointManager]::Expect100Continue = $false
+[System.Net.ServicePointManager]::UseNagleAlgorithm = $false
 $carpeta = Split-Path -Parent $MyInvocation.MyCommand.Path
 $archivoIp = Join-Path $carpeta "ip-pc1.txt"
 
@@ -31,6 +39,18 @@ try {
   Write-Host "- ¿La IP es correcta? Para cambiarla, borrá ip-pc1.txt y abrí este puente de nuevo."
   exit 1
 }
+
+# Se actualiza solo: si la PC 1 tiene una versión más nueva del puente, la copia y se reinicia
+try {
+  $nuevo = (New-Object System.Net.WebClient).DownloadData($destino + "/puente-pc2/puente.ps1")
+  $propio = [System.IO.File]::ReadAllBytes($MyInvocation.MyCommand.Path)
+  if ($nuevo.Length -gt 1000 -and [Convert]::ToBase64String($nuevo) -ne [Convert]::ToBase64String($propio)) {
+    [System.IO.File]::WriteAllBytes($MyInvocation.MyCommand.Path, $nuevo)
+    Write-Host "Puente actualizado a la versión nueva. Reiniciando..." -ForegroundColor Yellow
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $MyInvocation.MyCommand.Path -Pc1 $Pc1 -Puerto $Puerto
+    exit
+  }
+} catch {}
 
 $escucha = New-Object System.Net.HttpListener
 $escucha.Prefixes.Add("http://localhost:" + $Puerto + "/")
